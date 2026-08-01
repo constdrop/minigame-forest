@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>ミニゲームポータブル</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+<body>
+    <h1>二人のミニゲームポータル</h1>
+    <div class="menu">
+        <button onclick="showGame('block')">ブロックくずし</button>
+        <button onclick="showGame('janken')">じゃんけん</button>
+        <button onclick="showGame('marubatsu')">まるばつ</button>
+        <button onclick="showGame('mikan')">みかん育成</button>
+        </div>
+
+        <hr>
+
+        <div id="game-area">
+            <p>遊びたいゲームを選んでね！</p>
+        </div>
+<script type="module" src="/main.js"></script>
+<script>
+    function showGame (gameId) {
+        if (window.destroyBlockGame && typeof window.destroyBlockGame === 'function') {
+            window.destroyBlockGame();
+        }
+        const area = document.getElementById('game-area');
+        if (gameId === 'block') {
+            area.innerHTML = '<h2>ブロックくずし中．．．</h2><div id="block-ui"></div>';
+            if (typeof initBlock === 'function') initBlock();
+        } else if (gameId === 'janken') {
+            area.innerHTML = '<h2>じゃんけん中．．．</h2><div id="janken-ui"></div>';
+            if (Opal && Opal.Object) Opal.Object.$init_janken();
+        } else if (gameId === 'marubatsu') {
+            area.innerHTML = '<h2>まるばつゲーム中．．．</h2><div id="marubatsu-ui"></div>';
+            if (Opal && Opal.Object) Opal.Object.$render_board();
+        } else if (gameId === 'mikan') {
+            area.innerHTML = '<h2>みかん育成中．．．</h2><div id="mikan-ui"></div>';
+            if (Opal && Opal.Object) Opal.Object.$render_mikan();
+        }
+    }
+    </script>
+    </body>
+    </html>
