@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8" />
+    <title>Brick Breaker Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <script src="phaser.min.js"></script>
+</head>
+<body>
+<script>
+    let game = new Phaser.Game(480, 320, Phaser.CANVAS, '', {
+        preload: preload,
+        create: create,
+        update: update
+    });
+
+    let ball;
+    let paddle;
+    let bricks;
+    let score = 0;
+    let scoreText;
+    let lives = 3;
+    let livesText;
+    let lifeLostText;
+    let brickInfo;
+    let playing = false;
+
+    function preload() {
+        game.load.image("ball", "img/ball.png");
+        game.load.image("paddle", "img/paddle.png");
+        game.load.image("brick", "img/brick.png");
+        this.load.spritesheet("ball", "img/wobble.png", 20, 20);
+game.load.spritesheet("button", "img/button.png", 120, 40);
+};
+
+    function create() {
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+
+ball = game.add.sprite(
+    game.world.width * 0.5,
+    game.world.height - 25,
+    "ball"
+);
+ball.anchor.set(0.5);
+
+game.physics.arcade.enable(ball);
+ball.body.collideWorldBounds = true;
+ball.body.bounce.set(1);
+
+// ★1: 通常はフレーム 0 を固定表示
+ball.frame = 0;
+
+// ★2: wobble アニメーション登録
+ball.animations.add("wobble", [0, 1, 2, 1], 20, false);
+
+ball.checkWorldBounds = true;
+ball.events.onOutOfBounds.add(ballLeaveScreen, this);
+       
+        paddle = game.add.sprite(game.world.width * 0.5, game.world.height - 5, "paddle");
+        paddle.anchor.set(0.5, 1);
+        game.physics.arcade.enable(paddle);
+        paddle.body.immovable = true;
+
+        game.physics.arcade.checkCollision.down = false;
+
+        initBricks();
+
+        const textStyle = { font: "18px Arial", fill: "#0095DD" };
+        scoreText = game.add.text(5, 5, "Points: 0", textStyle);
+        livesText = game.add.text(game.world.width - 5, 5, `Lives: ${lives}`, textStyle);
+        livesText.anchor.set(1, 0);
+
+        lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, "Life lost, click to continue", textStyle);
+        lifeLostText.anchor.set(0.5);
+        lifeLostText.visible = false;
+startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
+        startButton.anchor.set(0.5);
+    }
+
+function startGame() {
+        startButton.destroy(); // ボタンを消す
+        ball.body.velocity.set(150, -150); // ボールを動かす
+        playing = true;
+    }
+
+function update() {
+    // playing が true の時だけパドルを動かす
+    if (playing && typeof game.input.x === "number") {
+        paddle.x = game.input.x;
+    }
+
+    game.physics.arcade.collide(ball, paddle, hitPaddle);
+    game.physics.arcade.collide(ball, bricks, hitBrick);
+}
+
+    function initBricks() {
+        brickInfo = {
+            width: 50,
+            height: 20,
+            count: {
+                row: 3,
+                col: 7
+            },
+            offset: {
+                top: 50,
+                left: 60
+            },
+            padding: 10
+        };
+
+        bricks = game.add.group();
+
+        for (let c = 0; c < brickInfo.count.col; c++) {
+            for (let r = 0; r < brickInfo.count.row; r++) {
+                const brickX = c * (brickInfo.width + brickInfo.padding) + brickInfo.offset.left;
+                const brickY = r * (brickInfo.height + brickInfo.padding) + brickInfo.offset.top;
+
+                let newBrick = game.add.sprite(brickX, brickY, 'brick');
+                game.physics.arcade.enable(newBrick);
+                newBrick.body.immovable = true;
+                newBrick.anchor.set(0.5);
+                bricks.add(newBrick);
+            }
+        }
+    }
+
+function hitBrick(ball, brick) {
+    brick.kill();
+    score += 10;
+    scoreText.text = `Points: ${score}`;
+
+    // ★ wobble アニメ再生
+    let anim = ball.animations.play("wobble");
+
+    // アニメ終了後にフレーム0へ戻す
+    anim.onComplete.add(() => {
+        ball.frame = 0;
+    });
+
+    if (bricks.countLiving() === 0) {
+        alert("You won the game, congratulations!");
+        location.reload();
+    }
+}
+
+
+function hitPaddle(ball, paddle) {
+    // ボールのアニメーションを再生
+    ball.animations.play("wobble");
+
+    // パドルの中心からボールがどれくらい離れているかを計算
+    // 右側ならプラス、左側ならマイナスの値になります
+    let diff = ball.x - paddle.x;
+
+    // 離れれば離れるほど（diffが大きいほど）、横方向の速度（velocity.x）を大きくする
+    // 「10」という数字を大きくすると、より急な角度で飛ぶようになります
+    ball.body.velocity.x = 50 * diff;
+}
+
+function ballLeaveScreen() {
+    lives--;
+    if (lives > 0) {
+        // まだ残機がある場合
+        livesText.text = `Lives: ${lives}`;
+        lifeLostText.visible = true;
+
+        // ボールとパドルを真ん中に戻す
+        ball.reset(game.world.width * 0.5, game.world.height - 25);
+        paddle.reset(game.world.width * 0.5, game.world.height - 5);
+        
+        // ボールの動きを一旦止める
+        ball.body.velocity.set(0, 0);
+        playing = false;
+
+        // 【ここが重要！】クリックされた時の処理
+        game.input.onDown.addOnce(() => {
+            lifeLostText.visible = false; // 文字を消す
+            ball.body.velocity.set(150, -150); // ★ボールに速度を与えて動かす
+            playing = true; // パドルを動かせるようにする
+        }, this);
+
+    } else {
+        // ライフがゼロの場合
+        alert("You lost, game over!");
+        location.reload();
+    }
+}
+</script>
+</body>
+</html>
