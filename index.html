@@ -31,7 +31,7 @@
             if (typeof initBlock === 'function') initBlock();
         } else if (gameId === 'janken') {
             area.innerHTML = '<h2>じゃんけん中．．．</h2><div id="janken-ui"></div>';
-            if (Opal && Opal.Object) Opal.Object.$init_janken();
+            if (Opal && Opal.Object) window.initJanken();
         } else if (gameId === 'marubatsu') {
             area.innerHTML = '<h2>まるばつゲーム中．．．</h2><div id="marubatsu-ui"></div>';
             if (Opal && Opal.Object) Opal.Object.$render_board();
