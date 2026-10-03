@@ -27,8 +27,9 @@
         }
         const area = document.getElementById('game-area');
         if (gameId === 'block') {
-            area.innerHTML = '<h2>ブロックくずし中．．．</h2><div id="block-ui"></div>';
-            if (typeof initBlock === 'function') initBlock();
+            area.innerHTML = '<h2>ブロックくずし中．．．</h2><div id="block-ui" style="display: flex; justify-content: center;"></div>';
+            const ui = document.getElementById('block-ui');
+            ui.innerHTML = '<iframe src="./フェイザー/karennda.html" title="ブロックくずし" style="width: 480px; height: 340px; border: none;"></iframe>';
         } else if (gameId === 'janken') {
             area.innerHTML = '<h2>じゃんけん中．．．</h2><div id="janken-ui"></div>';
             if (Opal && Opal.Object) Opal.Object.$init_janken();
