@@ -47,7 +47,7 @@ class MikanGame
   def give_water
     return if @age >= 20 || @water > 10 || @food > 10
 
-    @water += 2
+    @water += 1
     @age += 1
     @food -= 1 # 水をあげると栄養が少し薄まる
     check_status("水をあげたよ！")
@@ -57,7 +57,7 @@ class MikanGame
   def give_food
     return if @age >= 20 || @water > 10 || @food > 10
 
-    @food += 2
+    @food += 1
     @age += 1
     @water -= 1 # 肥料をあげると喉が渇く
     check_status("肥料をあげたよ！")
