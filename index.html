@@ -37,7 +37,7 @@
             if (Opal && Opal.Object) Opal.Object.$render_board();
         } else if (gameId === 'mikan') {
             area.innerHTML = '<h2>みかん育成中．．．</h2><div id="mikan-ui"></div>';
-            if (Opal && Opal.Object) Opal.Object.$render_mikan();
+            if (Opal && Opal.Object) window.initMikan();
         }
     }
     </script>
