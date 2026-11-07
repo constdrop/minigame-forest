@@ -39,31 +39,31 @@
         game.load.image("paddle", "img/paddle.png");
         game.load.image("brick", "img/brick.png");
         this.load.spritesheet("ball", "img/wobble.png", 20, 20);
-game.load.spritesheet("button", "img/button.png", 120, 40);
-};
+        game.load.spritesheet("button", "img/button.png", 120, 40);
+    };
 
     function create() {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
-ball = game.add.sprite(
-    game.world.width * 0.5,
-    game.world.height - 25,
-    "ball"
-);
-ball.anchor.set(0.5);
+        ball = game.add.sprite(
+            game.world.width * 0.5,
+            game.world.height - 25,
+            "ball"
+        );
+        ball.anchor.set(0.5);
 
-game.physics.arcade.enable(ball);
-ball.body.collideWorldBounds = true;
-ball.body.bounce.set(1);
+        game.physics.arcade.enable(ball);
+        ball.body.collideWorldBounds = true;
+        ball.body.bounce.set(1);
 
-// ★1: 通常はフレーム 0 を固定表示
-ball.frame = 0;
+        // ★1: 通常はフレーム 0 を固定表示
+        ball.frame = 0;
 
-// ★2: wobble アニメーション登録
-ball.animations.add("wobble", [0, 1, 2, 1], 20, false);
+        // ★2: wobble アニメーション登録
+        ball.animations.add("wobble", [0, 1, 2, 1], 20, false);
 
-ball.checkWorldBounds = true;
-ball.events.onOutOfBounds.add(ballLeaveScreen, this);
+        ball.checkWorldBounds = true;
+        ball.events.onOutOfBounds.add(ballLeaveScreen, this);
        
         paddle = game.add.sprite(game.world.width * 0.5, game.world.height - 5, "paddle");
         paddle.anchor.set(0.5, 1);
@@ -82,17 +82,17 @@ ball.events.onOutOfBounds.add(ballLeaveScreen, this);
         lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, "Life lost, click to continue", textStyle);
         lifeLostText.anchor.set(0.5);
         lifeLostText.visible = false;
-startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
+        startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
         startButton.anchor.set(0.5);
     }
 
-function startGame() {
+    function startGame() {
         startButton.destroy(); // ボタンを消す
         ball.body.velocity.set(150, -150); // ボールを動かす
         playing = true;
     }
 
-function update() {
+    function update() {
     // playing が true の時だけパドルを動かす
     if (playing && typeof game.input.x === "number") {
         paddle.x = game.input.x;
@@ -133,67 +133,67 @@ function update() {
         }
     }
 
-function hitBrick(ball, brick) {
-    brick.kill();
-    score += 10;
-    scoreText.text = `Points: ${score}`;
+    function hitBrick(ball, brick) {
+        brick.kill();
+        score += 10;
+        scoreText.text = `Points: ${score}`;
 
-    // ★ wobble アニメ再生
-    let anim = ball.animations.play("wobble");
+        // ★ wobble アニメ再生
+        let anim = ball.animations.play("wobble");
 
-    // アニメ終了後にフレーム0へ戻す
-    anim.onComplete.add(() => {
-        ball.frame = 0;
-    });
+        // アニメ終了後にフレーム0へ戻す
+        anim.onComplete.add(() => {
+            ball.frame = 0;
+        });
 
-    if (bricks.countLiving() === 0) {
-        alert("You won the game, congratulations!");
-        location.reload();
+        if (bricks.countLiving() === 0) {
+            alert("You won the game, congratulations!");
+            location.reload();
+        }
     }
-}
 
 
-function hitPaddle(ball, paddle) {
-    // ボールのアニメーションを再生
-    ball.animations.play("wobble");
+    function hitPaddle(ball, paddle) {
+        // ボールのアニメーションを再生
+        ball.animations.play("wobble");
 
-    // パドルの中心からボールがどれくらい離れているかを計算
-    // 右側ならプラス、左側ならマイナスの値になります
-    let diff = ball.x - paddle.x;
+        // パドルの中心からボールがどれくらい離れているかを計算
+        // 右側ならプラス、左側ならマイナスの値になります
+        let diff = ball.x - paddle.x;
 
-    // 離れれば離れるほど（diffが大きいほど）、横方向の速度（velocity.x）を大きくする
-    // 「10」という数字を大きくすると、より急な角度で飛ぶようになります
-    ball.body.velocity.x = 50 * diff;
-}
-
-function ballLeaveScreen() {
-    lives--;
-    if (lives > 0) {
-        // まだ残機がある場合
-        livesText.text = `Lives: ${lives}`;
-        lifeLostText.visible = true;
-
-        // ボールとパドルを真ん中に戻す
-        ball.reset(game.world.width * 0.5, game.world.height - 25);
-        paddle.reset(game.world.width * 0.5, game.world.height - 5);
-        
-        // ボールの動きを一旦止める
-        ball.body.velocity.set(0, 0);
-        playing = false;
-
-        // 【ここが重要！】クリックされた時の処理
-        game.input.onDown.addOnce(() => {
-            lifeLostText.visible = false; // 文字を消す
-            ball.body.velocity.set(150, -150); // ★ボールに速度を与えて動かす
-            playing = true; // パドルを動かせるようにする
-        }, this);
-
-    } else {
-        // ライフがゼロの場合
-        alert("You lost, game over!");
-        location.reload();
+        // 離れれば離れるほど（diffが大きいほど）、横方向の速度（velocity.x）を大きくする
+        // 「10」という数字を大きくすると、より急な角度で飛ぶようになります
+        ball.body.velocity.x = 50 * diff;
     }
-}
+
+    function ballLeaveScreen() {
+        lives--;
+        if (lives > 0) {
+            // まだ残機がある場合
+            livesText.text = `Lives: ${lives}`;
+            lifeLostText.visible = true;
+
+            // ボールとパドルを真ん中に戻す
+            ball.reset(game.world.width * 0.5, game.world.height - 25);
+            paddle.reset(game.world.width * 0.5, game.world.height - 5);
+            
+            // ボールの動きを一旦止める
+            ball.body.velocity.set(0, 0);
+            playing = false;
+
+            // 【ここが重要！】クリックされた時の処理
+            game.input.onDown.addOnce(() => {
+                lifeLostText.visible = false; // 文字を消す
+                ball.body.velocity.set(150, -150); // ★ボールに速度を与えて動かす
+                playing = true; // パドルを動かせるようにする
+            }, this);
+
+        } else {
+            // ライフがゼロの場合
+            alert("You lost, game over!");
+            location.reload();
+        }
+    }
 </script>
 </body>
 </html>
