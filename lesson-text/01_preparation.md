@@ -64,9 +64,11 @@ gem 'opal', '>= 1.8.0'
 gem 'opal-vite'
 ```
 
-保存したら、ターミナルで以下のコマンドを実行して Ruby のパッケージをインストールします。（※あらかじめパソコンに Ruby がインストールされている必要があります）
+保存したら、ターミナルで以下のコマンドを実行して Ruby の gem をインストールします。（※あらかじめパソコンに Ruby がインストールされている必要があります）
 ```bash
+gem install opal-vite
 bundle install
+bundle exec binstubs opal-vite
 ```
 
 ---
@@ -100,7 +102,9 @@ import opal from 'vite-plugin-opal';
 
 export default defineConfig({
   plugins: [
-    opal()
+    opal({
+      debug: false // 余計なログ出力を抑えてJSONパースエラーを防止
+    })
   ],
   // GitHub Pagesで公開するためのベースパス設定（後で変更します）
   base: './'
@@ -157,16 +161,16 @@ export default defineConfig({
                 if (typeof initBlock === 'function') initBlock(); 
             } else if (gameId === 'janken') {
                 area.innerHTML = '<h2>じゃんけん中...</h2><div id="janken-ui"></div>';
-                // Opal（Ruby）で実装した関数を呼び出す
-                if (Opal && Opal.Object) Opal.Object.$init_janken();
+                // Ruby(Opal)でwindowに登録した初期化関数を呼び出す
+                if (typeof window.initJanken === 'function') window.initJanken();
             } else if (gameId === 'marubatsu') {
                 area.innerHTML = '<h2>まるばつゲーム中...</h2><div id="marubatsu-ui"></div>';
-                // Opal（Ruby）で実装した関数を呼び出す
-                if (Opal && Opal.Object) Opal.Object.$render_board();
+                // Ruby(Opal)でwindowに登録した初期化関数を呼び出す
+                if (typeof window.initMarubatsu === 'function') window.initMarubatsu();
             } else if (gameId === 'mikan') {
                 area.innerHTML = '<h2>みかん育成中...</h2><div id="mikan-ui"></div>';
-                // Opal（Ruby）で実装した関数を呼び出す
-                if (Opal && Opal.Object) Opal.Object.$render_mikan();
+                // Ruby(Opal)でwindowに登録した初期化関数を呼び出す
+                if (typeof window.initMikan === 'function') window.initMikan();
             }
         }
     </script>
